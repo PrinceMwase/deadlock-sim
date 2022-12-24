@@ -14,7 +14,6 @@ let requests = {
     p3: [0,2,0,3,1],
     p4: [0,2,1,1,0]
 };
-let count = 2;
 
 //verify the parity of the resources
 for (let i = 0; i < all.length; i++) {
@@ -32,16 +31,10 @@ for (let i = 0; i < all.length; i++) {
         }
     }
 
-    
-    console.log(`${i} + ${sum} `)
-
     if (all[i] !== sum ) {
         console.error("resources didnt pair. EXIT");
         break;
-        
     }
-   
-    
 }
 console.log("VERIFIED RESOURCES");
 
@@ -49,45 +42,40 @@ console.log("VERIFIED RESOURCES");
 mainEmgine();
 
 function mainEmgine() {
-    processNames.forEach((element, index) => {
+    let completed = true; // flag to check if all processes are completed
+    while (completed) {
+        completed = false; // reset the flag
+        for (let i = 0; i < processNames.length; i++) {
+            let element = processNames[i];
+            if (finished.includes(element)) continue; // skip processes that have already finished
 
-        
-
-        let takenResource = 0;
-
-        if (finished.toString().search(element) < 0)
+            let takenResource = 0;
             console.log("process : " + element + " requesting : " + requests[element]);
-            requests[element].forEach((x, i) => {
-
-                if (x <= available[i]) {
+            for (let j = 0; j < requests[element].length; j++) {
+                if (requests[element][j] <= available[j]) {
                     takenResource++;
-                };
-                //  check if its finished thenadd resources to the available array
-                if (takenResource === 5) {
-                    console.log(`${element} finished succeffully`);
-
-                    //adding back the values
-                    object[element].forEach((v, i) => {
-
-
-                        available[i] += v;
-
-
-                    });
-                    console.log(`available resources are now ${available.toString()}`);
-                    processNames[index].replace(element, 'complete');
-                    finished.push(processNames[index]);
-                             object[element] = [];
-                    requests[element] = [];
-
                 }
-            });
-    });
-    if(count > 0 && finished.length < processNames. length){  
-        
-        count --;
-        return mainEmgine();
-    }else{
-        console.log(`only ${finished.toString()} are the only processes finished`)
+            }
+
+            // check if the process can be granted all of the resources it needs
+            if (takenResource === requests[element].length) {
+                console.log(`${element} finished successfully`);
+
+                // adding back the values
+                object[element].forEach((v, i) => {
+                    available[i] += v;
+                });
+                console.log(`available resources are now ${available.toString()}`);
+                finished.push(element);
+                object[element] = [];
+                requests[element] = [];
+
+                // at least one process was marked as finished, so we need to continue looping
+                completed = false;
+            }
+        }
     }
+
+    console.log(`only ${finished.toString()} are the only processes finished`)
 }
+
