@@ -72,10 +72,18 @@ function mainEmgine() {
 
                 // at least one process was marked as finished, so we need to continue looping
                 completed = false;
+            } else {
+                // process was unable to be granted all its resources
+                console.log(`${element} was unable to be granted all its resources`);
+
+                // delay the request until some other process releases resources
+                console.log(`delaying ${element}'s request until resources are available`);
+                completed = true;
             }
         }
     }
 
     console.log(`only ${finished.toString()} are the only processes finished`)
 }
+
 
