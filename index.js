@@ -43,7 +43,9 @@ mainEmgine();
 
 function mainEmgine() {
     let completed = true; // flag to check if all processes are completed
-    while (completed) {
+    let deadlockDetected = false; // flag to check if deadlock has been detected
+    let processesInDeadlock = []; // list of processes involved in deadlock
+    while (completed && !deadlockDetected) {
         completed = false; // reset the flag
         for (let i = 0; i < processNames.length; i++) {
             let element = processNames[i];
@@ -76,14 +78,26 @@ function mainEmgine() {
                 // process was unable to be granted all its resources
                 console.log(`${element} was unable to be granted all its resources`);
 
-                // delay the request until some other process releases resources
-                console.log(`delaying ${element}'s request until resources are available`);
-                completed = true;
+                // check if this process is involved in a deadlock
+                if (processesInDeadlock.includes(element)) {
+                    console.log(`deadlock detected involving ${element}`);
+                    deadlockDetected = true;
+                } else {
+                    processesInDeadlock.push(element);
+                    console.log(`delaying ${element}'s request until resources are available`);
+                    completed = true;
+                }
             }
         }
     }
 
-    console.log(`only ${finished.toString()} are the only processes finished`)
+    if (deadlockDetected) {
+        console.log(`deadlock detected involving ${processesInDeadlock.toString()}`);
+        // implement deadlock recovery mechanism here (e.g. rolling back the state of the system)
+    } else {
+        console.log(`only ${finished.toString()} are the only processes finished`)
+    }
 }
+
 
 
